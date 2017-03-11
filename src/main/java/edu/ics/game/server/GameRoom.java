@@ -61,13 +61,18 @@ public class GameRoom {
 		return this.players;
 	}
 
+	private void sortPlayersByStatus() {
+		this.players.sort((e1, e2) -> this.playerStatus.get(e1).compareTo(this.playerStatus.get(e2)));
+	}
+
 	public void addPlayer(GamePlayer player) {
 		this.players.add(player);
-		if (this.players.size() > this.getPlayersMax()) {
+		if (this.getStatus() == GameRoomPlayerStatus.PLAYING || this.getPlayersReady() + this.getPlayersWaiting() > this.getPlayersMax()) {
 			this.playerStatus.put(player, GameRoomPlayerStatus.WATCHING);
 		} else {
 			this.playerStatus.put(player, GameRoomPlayerStatus.WAITING);
 		}
+		this.sortPlayersByStatus();
 	}
 
 	public void removePlayer(GamePlayer player) {
@@ -81,6 +86,7 @@ public class GameRoom {
 
 		this.players.remove(player);
 		this.playerStatus.remove(player);
+		this.sortPlayersByStatus();
 	}
 
 	public GameRoomPlayerStatus getStatus() {
@@ -104,6 +110,7 @@ public class GameRoom {
 	public void ready(GamePlayer player) {
 		if (this.getStatus() == GameRoomPlayerStatus.WAITING && this.playerStatus.get(player) == GameRoomPlayerStatus.WAITING) {
 			this.playerStatus.put(player, GameRoomPlayerStatus.READY);
+			this.sortPlayersByStatus();
 
 			if (this.getStatus() == GameRoomPlayerStatus.READY) {
 				this.play();
@@ -114,6 +121,7 @@ public class GameRoom {
 	public void wait(GamePlayer player) {
 		if (this.getStatus() == GameRoomPlayerStatus.WAITING && this.getPlayersWaiting() < this.getPlayersMax()) {
 			this.playerStatus.put(player, GameRoomPlayerStatus.WAITING);
+			this.sortPlayersByStatus();
 		}
 	}
 
@@ -128,6 +136,7 @@ public class GameRoom {
 				this.playerStatus.put(player, GameRoomPlayerStatus.PLAYING);
 			}
 		}
+		this.sortPlayersByStatus();
 	}
 
 	public void play(GamePlayer player, int... args) {
@@ -138,7 +147,8 @@ public class GameRoom {
 					if (this.playerStatus.get(_player) == GameRoomPlayerStatus.PLAYING) {
 						this.playerStatus.put(_player, GameRoomPlayerStatus.WAITING);
 					}
-				}			
+				}
+				this.sortPlayersByStatus();
 			}
 		}
 	}
