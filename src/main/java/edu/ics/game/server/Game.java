@@ -24,14 +24,14 @@ public abstract class Game {
 	protected int currentPlayer = 0;
 	protected int winner = -1;
 
-	protected GameStatus status;
+	protected boolean ended;
 
 	protected int width;
 	protected int height;
 	protected int[][] board;
 
 	protected Game(int width, int height) {
-		this.status = GameStatus.PLAYING;
+		this.ended = false;
 		this.width = width;
 		this.height = height;
 		this.board = new int[width][height];
@@ -57,7 +57,7 @@ public abstract class Game {
 			}
 		}
 
-		state.put("status", this.status.toString());
+		state.put("ended", this.ended);
 		state.put("winner", this.winner);
 
 		return state;
@@ -77,8 +77,8 @@ public abstract class Game {
 		return false;
 	}
 
-	public GameStatus getStatus() {
-		return status;
+	public boolean isEnded() {
+		return ended;
 	}
 
 	public int getCurrentPlayer() {

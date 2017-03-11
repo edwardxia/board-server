@@ -14,7 +14,7 @@ public class GameRoom {
 	private Class<? extends Game> gameClass;
 	private Game game = null;
 	private String name;
-	private Map<GamePlayer,GameStatus> playerStatus = new HashMap<>();
+	private Map<GamePlayer,GameRoomPlayerStatus> playerStatus = new HashMap<>();
 	private List<GamePlayer> players = new ArrayList<>();
 
 	public GameRoom(Class<? extends Game> gameClass, String name) {
@@ -64,17 +64,17 @@ public class GameRoom {
 	public void addPlayer(GamePlayer player) {
 		this.players.add(player);
 		if (this.players.size() > this.getPlayersMax()) {
-			this.playerStatus.put(player, GameStatus.WATCHING);
+			this.playerStatus.put(player, GameRoomPlayerStatus.WATCHING);
 		} else {
-			this.playerStatus.put(player, GameStatus.WAITING);
+			this.playerStatus.put(player, GameRoomPlayerStatus.WAITING);
 		}
 	}
 
 	public void removePlayer(GamePlayer player) {
-		if (this.getStatus() == GameStatus.PLAYING && this.playerStatus.get(player) == GameStatus.PLAYING) {
+		if (this.getStatus() == GameRoomPlayerStatus.PLAYING && this.playerStatus.get(player) == GameRoomPlayerStatus.PLAYING) {
 			for (GamePlayer _player : this.players) {
-				if (this.playerStatus.get(_player) == GameStatus.PLAYING) {
-					this.playerStatus.put(_player, GameStatus.WAITING);
+				if (this.playerStatus.get(_player) == GameRoomPlayerStatus.PLAYING) {
+					this.playerStatus.put(_player, GameRoomPlayerStatus.WAITING);
 				}
 			}
 		}
@@ -83,37 +83,37 @@ public class GameRoom {
 		this.playerStatus.remove(player);
 	}
 
-	public GameStatus getStatus() {
+	public GameRoomPlayerStatus getStatus() {
 		int waitCount = 0;
 		int readyCount = 0;
 		for (GamePlayer player: this.getPlayers()) {
-			if (this.playerStatus.get(player) == GameStatus.PLAYING) {
-				return GameStatus.PLAYING;
-			} else if (this.playerStatus.get(player) == GameStatus.READY) {
+			if (this.playerStatus.get(player) == GameRoomPlayerStatus.PLAYING) {
+				return GameRoomPlayerStatus.PLAYING;
+			} else if (this.playerStatus.get(player) == GameRoomPlayerStatus.READY) {
 				readyCount++;
-			} else if (this.playerStatus.get(player) == GameStatus.WAITING) {
+			} else if (this.playerStatus.get(player) == GameRoomPlayerStatus.WAITING) {
 				waitCount++;
 			}
 		}
 		if (readyCount >= this.getPlayersMin() && waitCount == 0) {
-			return GameStatus.READY;
+			return GameRoomPlayerStatus.READY;
 		}
-		return GameStatus.WAITING;
+		return GameRoomPlayerStatus.WAITING;
 	}
 
 	public void ready(GamePlayer player) {
-		if (this.getStatus() == GameStatus.WAITING && this.playerStatus.get(player) == GameStatus.WAITING) {
-			this.playerStatus.put(player, GameStatus.READY);
+		if (this.getStatus() == GameRoomPlayerStatus.WAITING && this.playerStatus.get(player) == GameRoomPlayerStatus.WAITING) {
+			this.playerStatus.put(player, GameRoomPlayerStatus.READY);
 
-			if (this.getStatus() == GameStatus.READY) {
+			if (this.getStatus() == GameRoomPlayerStatus.READY) {
 				this.play();
 			}
 		}
 	}
 
 	public void wait(GamePlayer player) {
-		if (this.getStatus() == GameStatus.WAITING && this.getPlayersWaiting() < this.getPlayersMax()) {
-			this.playerStatus.put(player, GameStatus.WAITING);
+		if (this.getStatus() == GameRoomPlayerStatus.WAITING && this.getPlayersWaiting() < this.getPlayersMax()) {
+			this.playerStatus.put(player, GameRoomPlayerStatus.WAITING);
 		}
 	}
 
@@ -124,19 +124,19 @@ public class GameRoom {
 			e.printStackTrace();
 		}
 		for (GamePlayer player : this.players) {
-			if (this.playerStatus.get(player) == GameStatus.READY) {
-				this.playerStatus.put(player, GameStatus.PLAYING);
+			if (this.playerStatus.get(player) == GameRoomPlayerStatus.READY) {
+				this.playerStatus.put(player, GameRoomPlayerStatus.PLAYING);
 			}
 		}
 	}
 
 	public void play(GamePlayer player, int... args) {
-		if (this.getStatus() == GameStatus.PLAYING && this.players.indexOf(player) == this.game.getCurrentPlayer()) {
+		if (this.getStatus() == GameRoomPlayerStatus.PLAYING && this.players.indexOf(player) == this.game.getCurrentPlayer()) {
 			this.game.play(args);
-			if (this.game.getStatus() == GameStatus.ENDED) {
+			if (this.game.isEnded()) {
 				for (GamePlayer _player : this.players) {
-					if (this.playerStatus.get(_player) == GameStatus.PLAYING) {
-						this.playerStatus.put(_player, GameStatus.WAITING);
+					if (this.playerStatus.get(_player) == GameRoomPlayerStatus.PLAYING) {
+						this.playerStatus.put(_player, GameRoomPlayerStatus.WAITING);
 					}
 				}			
 			}
@@ -163,8 +163,8 @@ public class GameRoom {
 
 	public int getPlayersReady() {
 		int count = 0;
-		for (GameStatus status : this.playerStatus.values()) {
-			if (status == GameStatus.READY) {
+		for (GameRoomPlayerStatus status : this.playerStatus.values()) {
+			if (status == GameRoomPlayerStatus.READY) {
 				count++;
 			}
 		}
@@ -173,8 +173,8 @@ public class GameRoom {
 
 	public int getPlayersWaiting() {
 		int count = 0;
-		for (GameStatus status : this.playerStatus.values()) {
-			if (status == GameStatus.WAITING) {
+		for (GameRoomPlayerStatus status : this.playerStatus.values()) {
+			if (status == GameRoomPlayerStatus.WAITING) {
 				count++;
 			}
 		}

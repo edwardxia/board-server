@@ -13,9 +13,9 @@ public class TicTacToe extends Game {
 				this.board[x][y] = this.currentPlayer;
 				if (this.threeInARow(x, y)) {
 					this.winner = this.currentPlayer;
-					this.status = GameStatus.ENDED;
+					this.ended = true;
 				} else if (this.isFull()) {
-					this.status = GameStatus.ENDED;
+					this.ended = true;
 				} else {
 					this.next();
 				}

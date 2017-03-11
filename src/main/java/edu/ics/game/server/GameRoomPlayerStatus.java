@@ -1,9 +1,8 @@
 package edu.ics.game.server;
 
-public enum GameStatus {
+public enum GameRoomPlayerStatus {
 	WAITING,
 	READY,
 	PLAYING,
-	ENDED,
 	WATCHING
 }
