@@ -10,7 +10,7 @@ public class TicTacToe extends Game {
 			int x = args[0];
 			int y = args[1];
 			if (this.isEmpty(x, y)) {
-				this.board[x][y] = this.currentPlayer;
+				this.board[y][x] = this.currentPlayer;
 				if (this.threeInARow(x, y)) {
 					this.winner = this.currentPlayer;
 					this.ended = true;
@@ -33,7 +33,7 @@ public class TicTacToe extends Game {
 
 				int count = 0;
 				for (int i = x - 2 * _x, j = y - 2 * _y; i <= x + 2 * _x && j <= y + 2 * _y; i += _x, j += _y) {
-					if (this.isInBounds(i, j) && this.board[i][j] == this.currentPlayer) {
+					if (this.isInBounds(i, j) && this.board[j][i] == this.currentPlayer) {
 						count++;
 						if (count == 3) {
 							return true;
@@ -46,9 +46,9 @@ public class TicTacToe extends Game {
 	}
 
 	private boolean isFull() {
-		for (int x = 0; x < this.width; x++) {
-			for (int y = 0; y < this.height; y++) {
-				if (this.board[x][y] == -1) {
+		for (int y = 0; y < this.height; y++) {
+			for (int x = 0; x < this.width; x++) {
+				if (this.board[y][x] == -1) {
 					return false;
 				}
 			}

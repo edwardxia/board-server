@@ -34,11 +34,11 @@ public abstract class Game {
 		this.ended = false;
 		this.width = width;
 		this.height = height;
-		this.board = new int[width][height];
+		this.board = new int[height][width];
 
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				this.board[x][y] = -1;
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				this.board[y][x] = -1;
 			}
 		}
 	}
@@ -50,10 +50,10 @@ public abstract class Game {
 		state.put("name", this.getClass().getSimpleName());
 
 		ArrayNode boardState = state.putArray("board");
-		for (int x = 0; x < this.width; x++) {
+		for (int y = 0; y < this.height; y++) {
 			ArrayNode rowState = boardState.addArray();
-			for (int y = 0; y < this.height; y++) {
-				rowState.add(this.board[x][y]);
+			for (int x = 0; x < this.width; x++) {
+				rowState.add(this.board[y][x]);
 			}
 		}
 
@@ -71,7 +71,7 @@ public abstract class Game {
 	}
 
 	protected boolean isEmpty(int x, int y) {
-		if (this.isInBounds(x, y) && this.board[x][y] == -1) {
+		if (this.isInBounds(x, y) && this.board[y][x] == -1) {
 			return true;
 		}
 		return false;
