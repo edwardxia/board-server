@@ -26,8 +26,11 @@ public class Server {
 
 		server.addEventListener("chat", JsonNode.class, new DataListener<JsonNode>() {
 			public void onData(SocketIOClient client, JsonNode data, AckRequest ackSender) throws Exception {
-				if (data.hasNonNull("global")) {
-					server.getBroadcastOperations().sendEvent("chat", client, data);
+				if (data.hasNonNull("channel")) {
+					String channel = data.get("channel").asText();
+					if (channel.equals("global")) {
+						server.getBroadcastOperations().sendEvent("chat", client, data);
+					}
 				}
 			}
 		});
@@ -69,10 +72,13 @@ public class Server {
 
 			namespace.addEventListener("chat", JsonNode.class, new DataListener<JsonNode>() {
 				public void onData(SocketIOClient client, JsonNode data, AckRequest ackSender) throws Exception {
-					if (data.hasNonNull("room")) {
-						namespace.getRoomOperations(data.get("room").asText()).sendEvent("chat", client, data);
-					} else if (data.hasNonNull("lobby")) {
-						namespace.getBroadcastOperations().sendEvent("chat", client, data);
+					if (data.hasNonNull("channel")) {
+						String channel = data.get("channel").asText();
+						if (channel.equals("room")) {
+							namespace.getRoomOperations(data.get("room").asText()).sendEvent("chat", client, data);
+						} else if (channel.equals("lobby")) {
+							namespace.getBroadcastOperations().sendEvent("chat", client, data);
+						}
 					}
 				}				
 			});
