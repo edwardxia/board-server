@@ -24,6 +24,14 @@ public class Server {
 
 		server = new SocketIOServer(config);
 
+		server.addEventListener("chat", JsonNode.class, new DataListener<JsonNode>() {
+			public void onData(SocketIOClient client, JsonNode data, AckRequest ackSender) throws Exception {
+				if (data.hasNonNull("global")) {
+					server.getBroadcastOperations().sendEvent("chat", client, data);
+				}
+			}
+		});
+
 		for (Class<? extends Game> gameClass : Game.AVAILABLE_GAMES) {
 			SocketIONamespace namespace = server.addNamespace("/" + gameClass.getSimpleName());
 			GameLobby lobby = new GameLobby(gameClass);
@@ -63,7 +71,7 @@ public class Server {
 				public void onData(SocketIOClient client, JsonNode data, AckRequest ackSender) throws Exception {
 					if (data.hasNonNull("room")) {
 						namespace.getRoomOperations(data.get("room").asText()).sendEvent("chat", client, data);
-					} else {
+					} else if (data.hasNonNull("lobby")) {
 						namespace.getBroadcastOperations().sendEvent("chat", client, data);
 					}
 				}				
