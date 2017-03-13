@@ -59,6 +59,7 @@ public abstract class Game {
 			}
 		}
 
+		state.put("turn", this.currentPlayer);
 		state.put("ended", this.ended);
 		state.put("winner", this.winner);
 
