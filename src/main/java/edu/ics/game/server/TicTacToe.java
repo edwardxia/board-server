@@ -24,22 +24,18 @@ public class TicTacToe extends Game {
 	}
 
 	private boolean threeInARow(int x, int y) {		
-		int[] arr = {0, 1};
-		for (int _x : arr) {
-			for (int _y: arr) {
-				if (_x == 0 && _y == 0) {
-					continue;
-				}
-
-				int count = 0;
-				for (int i = x - 2 * _x, j = y - 2 * _y; i <= x + 2 * _x && j <= y + 2 * _y; i += _x, j += _y) {
-					if (this.isInBounds(i, j) && this.board[j][i] == this.currentPlayer) {
-						count++;
-						if (count == 3) {
-							return true;
-						}
+		int[][] arr = {{0, 1}, {1, 0}, {1, 1}, {-1, 1}};
+		for (int[] directions : arr) {
+			int _x = directions[0];
+			int _y = directions[1];
+			int count = 0;
+			for (int i = x - 2 * _x, j = y - 2 * _y; (_x < 0 ? i >= x + 2 * _x : i <= x + 2 * _x ) && (_y < 0 ? j >= y + 2 * _y : j <= y + 2 * _y); i += _x, j += _y) {
+				if (this.isInBounds(i, j) && this.board[j][i] == this.currentPlayer) {
+					count++;
+					if (count == 3) {
+						return true;
 					}
-				} 
+				}
 			}
 		}
 		return false;
