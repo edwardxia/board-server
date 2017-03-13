@@ -1,11 +1,11 @@
 package edu.ics.game.server;
 
 public class Coordinates {
-	int row = 0;
-	int column = 0;
+	public int column = 0;
+	public int row = 0;
 	
-	Coordinates(int x, int y){
-		row = x;
-		column = y;
+	Coordinates(int row, int column) {
+		this.row = row;
+		this.column = column;
 	}
 }
