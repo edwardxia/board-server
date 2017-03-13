@@ -111,6 +111,6 @@ public class Othello extends Game {
 	}
 
 	private int getOpponentPlayer(){
-		return (this.currentPlayer + 1) % this.players;
+		return this.getNextPlayer();
 	}
 }

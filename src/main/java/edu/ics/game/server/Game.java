@@ -85,12 +85,16 @@ public abstract class Game {
 		return currentPlayer;
 	}
 
+	public int getNextPlayer() {
+		return (this.currentPlayer + 1) % this.players;
+	}
+
 	protected void setCurrentPlayer(int currentPlayer) {
 		this.currentPlayer = currentPlayer;
 	}
 
 	protected void next() {
-		this.currentPlayer = (this.currentPlayer + 1) % this.players;
+		this.currentPlayer = this.getNextPlayer();
 	}
 
 	public abstract void play(int... args);
