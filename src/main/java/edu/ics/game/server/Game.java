@@ -50,10 +50,12 @@ public abstract class Game {
 		state.put("name", this.getClass().getSimpleName());
 
 		ArrayNode boardState = state.putArray("board");
+
+		int[][] board = this.getBoard();
 		for (int row = 0; row < this.height; row++) {
 			ArrayNode rowState = boardState.addArray();
 			for (int column = 0; column < this.width; column++) {
-				rowState.add(this.board[row][column]);
+				rowState.add(board[row][column]);
 			}
 		}
 
@@ -79,6 +81,10 @@ public abstract class Game {
 
 	public boolean isEnded() {
 		return ended;
+	}
+
+	public int[][] getBoard() {
+		return this.board;
 	}
 
 	public int getCurrentPlayer() {
