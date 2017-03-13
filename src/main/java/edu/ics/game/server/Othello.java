@@ -1,107 +1,86 @@
 package edu.ics.game.server;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class Othello extends Game {
-	
-	//tiles that need to be flipped
-	ArrayList<Coordinates> flippableTiles = new ArrayList<Coordinates>();
-	ArrayList<Coordinates> coords = new ArrayList<Coordinates>(Arrays.asList(new Coordinates(0,1), new Coordinates(1,1),
-			new Coordinates(1,0), new Coordinates(1,-1), new Coordinates(0,-1),
-			new Coordinates(-1,-1), new Coordinates(-1,0), new Coordinates(-1,1)));
-	
+
 	public Othello() {
 		super(8, 8);
-		
-		//intialize board pieces
+
+		// initialize board pieces
 		this.board[3][3] = 0;
 		this.board[3][4] = 1;
 		this.board[4][3] = 1;
 		this.board[4][4] = 0;
 	}
-		
+
 	public void play(int... args) {
 		if (args.length >= 2) {
-			int x = args[0];	//column
-			int y = args[1];	//row
-			
-			//check if player's move is valid and flip appropriate pieces if true
-			if(isValid(y,x)){
-				flip();
-				this.board[y][x] = this.currentPlayer;
-				
-				//change player to other player to check if they have any valid moves
+			int row = args[0];
+			int column = args[1];
+
+			if (isValidMove(row, column)) {
+				this.flip(row, column);
 				this.next();
-				if(!validMoves())	//if opponent doesn't have any valid moves return control back to current player
-					this.next();
-				
-				//check for winner
-				if(gameOver()){
+			}
+
+			if (!hasValidMoves()) {	//if opponent doesn't have any valid moves return control back to current player
+				this.next();
+
+				if (!hasValidMoves()) {	//if current player also doesn't have any valid moves the game ends
 					this.ended = true;
-				}
-			}			
-		}
-	}
-	
-	// Check if player move is valid
-	private boolean isValid(int y, int x) {
-		//if move wanted is not empty space or is out of bounds then return false
-		if(this.board[y][x] != -1 || !this.isInBounds(y, x))
-			return false;
-		
-		//place temp piece to test if move is valid
-		this.board[y][x] = this.currentPlayer;
-		
-		for(int i = 0; i < this.coords.size(); i++){	//goes through each cardinal direction
-			int row = y, col = x;	//temp variables for move checking
-			int yDirection = this.coords.get(i).row;
-			int xDirection = this.coords.get(i).column;
-			
-			row += yDirection;		//move position to first adjacent piece
-			col += xDirection;
-			
-			if(this.isInBounds(row, col) && this.board[row][col] == ((this.currentPlayer + 1) % this.players)){	//if adjacent piece is in bounds and is other player
 
-				while(this.board[row][col] == ((this.currentPlayer + 1) % this.players)){
-					row += yDirection;		//move position to next adjacent piece
-					col += xDirection;
-					
-					if(!this.isInBounds(row, col))		//if out of bounds, then not valid path and break to next cardinal direction
-						break;
-				}
-
-				if(this.isInBounds(row, col) && this.board[row][col] == this.currentPlayer){		//if i am found then this is a valid move so we add tiles to flip
-					while(true){
-						row -= yDirection;
-						col -= xDirection;
-						
-						if(row == y && col == x)
-							break;
-						
-						this.flippableTiles.add(new Coordinates(row,col));
+					int countCurrentPlayer = this.count(this.currentPlayer);
+					int countOpponentPlayer = this.count(this.getOpponentPlayer());
+					if (countCurrentPlayer > countOpponentPlayer) {
+						this.winner = this.currentPlayer;
+					} else if (countCurrentPlayer < countOpponentPlayer) {
+						this.winner = this.getOpponentPlayer();
 					}
 				}
 			}
 		}
-		
-		this.board[y][x] = -1;		//remove temp piece used to test if move was valid
-		
-		if(this.flippableTiles.isEmpty())
+	}
+
+	private List<Coordinates> getFlipped(int row, int column) {
+		List<Coordinates> flipped = new ArrayList<>();
+
+		for (int _r = -1; _r <= 1; _r++) {
+			for (int _c = -1; _c <= 1; _c++) {
+				if (_r == 0 && _c == 0) {
+					continue;
+				}
+								
+				for (int r = row + _r, c = column + _c; this.isInBounds(r, c) && !this.isEmpty(r, c); r += _r, c += _c) {
+					if (this.board[r][c] == this.currentPlayer) {
+						for (r -= _r, c -= _c; r != row || c != column; r -= _r, c -= _c) {
+							flipped.add(new Coordinates(r, c));
+						}
+						break;
+					}
+
+				}
+			}
+		}
+		return flipped;
+	}
+
+	private boolean isValidMove(int row, int column) {
+		if (!this.isInBounds(row, column) || !this.isEmpty(row, column)) {
 			return false;
+		}
+
+		if (this.getFlipped(row, column).isEmpty()) {
+			return false;
+		}
+
 		return true;
-    }
-	
-	private void flip() {
-        for(int i = 0; i < this.flippableTiles.size(); i++)
-        	this.board[this.flippableTiles.get(i).row][this.flippableTiles.get(i).column] = this.currentPlayer;
-        this.flippableTiles.clear();
-    }
-	
-	private boolean validMoves(){
-		for(int y = 0; y < this.height; y++){
-			for(int x = 0; x < this.width; x++){
-				if(isValid(y,x)){
-					this.flippableTiles.clear();
+	}
+
+	private boolean hasValidMoves() {
+		for (int y = 0; y < this.height; y++) {
+			for (int x = 0; x < this.width; x++) {
+				if (isValidMove(y, x)) {
 					return true;
 				}
 			}
@@ -109,51 +88,29 @@ public class Othello extends Game {
 		return false;
 	}
 	
-	private boolean gameOver(){
-		//check if current player has any valid moves left
-		if(validMoves()){
-			return false;
+	private void flip(int row, int column) {
+		List<Coordinates> flipped = this.getFlipped(row, column);
+
+		for(int i = 0; i < flipped.size(); i++) {
+			this.board[flipped.get(i).row][flipped.get(i).column] = this.currentPlayer;
 		}
-		
-		//check if opponent has any valid moves left
-		this.next();
-		if(validMoves()){
-			return false;
-		}
-		this.next();
-		
-		if(countPlayerOne() > countOpponent())
-			this.winner = this.currentPlayer;
-		else if(countPlayerOne() < countOpponent())
-			this.winner = (this.currentPlayer + 1) % this.players;
-		else{
-			this.tie = 0;
-			return true;
-		}
-			
-		
-		return true;
+
+		this.board[row][column] = this.currentPlayer;
 	}
-	
-	private int countPlayerOne(){
+
+	private int count(int player){
 		int count = 0;
-		for(int y = 0; y < this.height; y++){
-			for(int x = 0; x < this.width; x++){
-				if(this.board[y][x] == this.currentPlayer)
+		for (int y = 0; y < this.height; y++) {
+			for (int x = 0; x < this.width; x++) {
+				if (this.board[y][x] == player) {
 					count++;
+				}
 			}
 		}
 		return count;
 	}
-	
-	private int countOpponent(){
-		int count = 0;
-		for(int y = 0; y < this.height; y++){
-			for(int x = 0; x < this.width; x++){
-				if(this.board[y][x] == (this.currentPlayer + 1) % this.players)
-					count++;
-			}
-		}
-		return count;
+
+	private int getOpponentPlayer(){
+		return (this.currentPlayer + 1) % this.players;
 	}
 }
