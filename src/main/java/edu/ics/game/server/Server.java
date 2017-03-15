@@ -19,7 +19,6 @@ public class Server {
 	public Server() throws InterruptedException {
 
 		Configuration config = new Configuration();
-		config.setHostname("169.234.51.68");
 		config.setPort(3000);
 
 		server = new SocketIOServer(config);
@@ -43,14 +42,12 @@ public class Server {
 				public void onConnect(SocketIOClient client) {
 					lobby.addPlayerByUUID(client.getSessionId());
 
-					System.out.println(lobby.getPlayerByUUID(client.getSessionId()).getName() + " connected.");
+					namespace.getBroadcastOperations().sendEvent("lobby", client, lobby.getState());
 				}
 			});
 
 			namespace.addDisconnectListener(new DisconnectListener() {
 				public void onDisconnect(SocketIOClient client) {
-					System.out.println(lobby.getPlayerByUUID(client.getSessionId()).getName() + " disconnected.");
-
 					List<String> roomNamesToLeave = new ArrayList<>();
 					for (GameRoom room : lobby.getPlayerByUUID(client.getSessionId()).getRooms()) {
 						roomNamesToLeave.add(room.getName());
@@ -67,6 +64,8 @@ public class Server {
 					}
 
 					lobby.removePlayerByUUID(client.getSessionId());
+
+					namespace.getBroadcastOperations().sendEvent("lobby", lobby.getState());
 				}
 			});
 
@@ -88,6 +87,7 @@ public class Server {
 					String name = data.asText();
 
 					lobby.getPlayerByUUID(client.getSessionId()).setName(name);
+					namespace.getBroadcastOperations().sendEvent("lobby", lobby.getState());
 				}
 			});
 
@@ -126,6 +126,8 @@ public class Server {
 					client.joinRoom(roomName);
 
 					namespace.getRoomOperations(roomName).sendEvent("room", lobby.getRoomByName(roomName).getState());
+
+					namespace.getBroadcastOperations().sendEvent("lobby", lobby.getState());
 				}
 			});
 
@@ -160,6 +162,7 @@ public class Server {
 						}
 					}
 
+					namespace.getBroadcastOperations().sendEvent("lobby", lobby.getState());
 				}
 			});
 
@@ -177,6 +180,8 @@ public class Server {
 						room.ready(lobby.getPlayerByUUID(client.getSessionId()));
 						namespace.getRoomOperations(room.getName()).sendEvent("room", room.getState());
 					}
+
+					namespace.getBroadcastOperations().sendEvent("lobby", lobby.getState());
 				}
 			});
 
@@ -194,6 +199,8 @@ public class Server {
 						room.wait(lobby.getPlayerByUUID(client.getSessionId()));
 						namespace.getRoomOperations(room.getName()).sendEvent("room", room.getState());
 					}
+
+					namespace.getBroadcastOperations().sendEvent("lobby", lobby.getState());
 				}
 			});
 
@@ -215,9 +222,12 @@ public class Server {
 							};
 							room.play(lobby.getPlayerByUUID(client.getSessionId()), move);
 							namespace.getRoomOperations(room.getName()).sendEvent("room", room.getState());
+
+							if (room.getStatus() != GameRoomPlayerStatus.PLAYING) {
+								namespace.getBroadcastOperations().sendEvent("lobby", lobby.getState());
+							}
 						}
 					}
-
 				}
 			});
 		}

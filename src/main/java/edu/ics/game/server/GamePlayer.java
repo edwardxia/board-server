@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class GamePlayer {
 	private String name = "Anonymous";
 	private UUID uuid;
@@ -35,5 +39,20 @@ public class GamePlayer {
 
 	public void leaveRoom(GameRoom room) {
 		this.rooms.remove(room);
+	}
+
+	public JsonNode getState() {
+		ObjectMapper mapper = new ObjectMapper();
+
+		ObjectNode state = mapper.createObjectNode();
+		state.put("name", this.getName());
+		if (this.rooms.size() > 0) {
+			this.rooms.sort((e1, e2) -> e1.getStatus().compareTo(e2.getStatus()));
+			state.put("status", this.rooms.get(0).getStatus().toString());
+		} else {
+			state.put("status", GameRoomPlayerStatus.IDLE.toString());
+		}
+
+		return state;
 	}
 }

@@ -4,5 +4,6 @@ public enum GameRoomPlayerStatus {
 	PLAYING,
 	READY,
 	WAITING,
-	WATCHING
+	WATCHING,
+	IDLE
 }

@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class GameLobby {
 	private Class<? extends Game> gameClass;
@@ -22,9 +23,17 @@ public class GameLobby {
 
 	public JsonNode getState() {
 		ObjectMapper mapper = new ObjectMapper();
-		ArrayNode state = mapper.createArrayNode();
+
+		ObjectNode state = mapper.createObjectNode();
+
+		ArrayNode rooms = state.putArray("rooms");
 		for (GameRoom room : this.rooms.values()) {
-			state.add(room.getState(false));
+			rooms.add(room.getState(false));
+		}
+
+		ArrayNode players = state.putArray("players");
+		for (GamePlayer player : this.players.values()) {
+			players.add(player.getState());
 		}
 		return state;
 	}
