@@ -19,7 +19,7 @@ public class Server {
 	public Server() throws InterruptedException {
 
 		Configuration config = new Configuration();
-		config.setHostname("localhost");
+		config.setHostname("169.234.51.68");
 		config.setPort(3000);
 
 		server = new SocketIOServer(config);
