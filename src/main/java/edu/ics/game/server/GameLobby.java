@@ -26,6 +26,8 @@ public class GameLobby {
 
 		ObjectNode state = mapper.createObjectNode();
 
+		state.put("name", this.gameClass.getSimpleName());
+
 		ArrayNode rooms = state.putArray("rooms");
 		for (GameRoom room : this.rooms.values()) {
 			rooms.add(room.getState(false));
