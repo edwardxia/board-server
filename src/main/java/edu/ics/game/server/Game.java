@@ -26,19 +26,19 @@ public abstract class Game {
 
 	protected boolean ended;
 
-	protected int width;
-	protected int height;
+	protected int columns;
+	protected int rows;
 	protected int[][] board;
 
-	protected Game(int width, int height) {
+	protected Game(int columns, int rows) {
 		this.ended = false;
-		this.width = width;
-		this.height = height;
-		this.board = new int[height][width];
-
-		for (int row = 0; row < height; row++) {
-			for (int column = 0; column < width; column++) {
-				this.board[row][column] = -1;
+		this.columns = columns;
+		this.rows = rows;
+		this.board = new int[columns][rows];
+		
+		for (int column = 0; column < columns; column++) {
+			for (int row = 0; row < rows; row++) {
+				this.board[column][row] = -1;
 			}
 		}
 	}
@@ -49,16 +49,16 @@ public abstract class Game {
 
 		state.put("name", this.getClass().getSimpleName());
 
-		state.put("height", this.height);
-		state.put("width", this.width);
+		state.put("height", this.rows);
+		state.put("width", this.columns);
 
 		ArrayNode boardState = state.putArray("board");
 
 		int[][] board = this.getBoard();
-		for (int row = 0; row < this.height; row++) {
-			ArrayNode rowState = boardState.addArray();
-			for (int column = 0; column < this.width; column++) {
-				rowState.add(board[row][column]);
+		for (int column = 0; column < this.columns; column++) {
+			ArrayNode columnState = boardState.addArray();
+			for (int row = 0; row < this.rows; row++) {
+				columnState.add(board[column][row]);
 			}
 		}
 
@@ -69,15 +69,15 @@ public abstract class Game {
 		return state;
 	};
 
-	protected boolean isInBounds(int row, int column) {
-		if (column >= 0 && column < this.width && row >= 0 && row < this.height) {
+	protected boolean isInBounds(int column, int row) {
+		if (column >= 0 && column < this.columns && row >= 0 && row < this.rows) {
 			return true;
 		}
 		return false;
 	}
 
-	protected boolean isEmpty(int row, int column) {
-		if (this.isInBounds(row, column) && this.board[row][column] == -1) {
+	protected boolean isEmpty(int column, int row) {
+		if (this.isInBounds(column, row) && this.board[column][row] == -1) {
 			return true;
 		}
 		return false;

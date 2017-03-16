@@ -8,19 +8,19 @@ public class Othello extends Game {
 		super(8, 8);
 
 		// initialize board pieces
-		this.board[3][3] = 1;
-		this.board[3][4] = 0;
-		this.board[4][3] = 0;
-		this.board[4][4] = 1;
+		this.board[3][3] = 0;
+		this.board[3][4] = 1;
+		this.board[4][3] = 1;
+		this.board[4][4] = 0;
 	}
 
 	public void play(int... args) {
 		if (args.length >= 2) {
-			int row = args[0];
-			int column = args[1];
+			int column = args[0];
+			int row = args[1];
 
-			if (isValidMove(row, column)) {
-				this.flip(row, column);
+			if (isValidMove(column, row)) {
+				this.flip(column, row);
 				this.next();
 			}
 
@@ -42,7 +42,7 @@ public class Othello extends Game {
 		}
 	}
 
-	private List<Coordinates> getFlipped(int row, int column) {
+	private List<Coordinates> getFlipped(int column, int row) {
 		List<Coordinates> flipped = new ArrayList<>();
 
 		for (int _r = -1; _r <= 1; _r++) {
@@ -50,11 +50,11 @@ public class Othello extends Game {
 				if (_r == 0 && _c == 0) {
 					continue;
 				}
-								
-				for (int r = row + _r, c = column + _c; this.isInBounds(r, c) && !this.isEmpty(r, c); r += _r, c += _c) {
-					if (this.board[r][c] == this.currentPlayer) {
+
+				for (int r = row + _r, c = column + _c; this.isInBounds(c, r) && !this.isEmpty(c, r); r += _r, c += _c) {
+					if (this.board[c][r] == this.currentPlayer) {
 						for (r -= _r, c -= _c; r != row || c != column; r -= _r, c -= _c) {
-							flipped.add(new Coordinates(r, c));
+							flipped.add(new Coordinates(c, r));
 						}
 						break;
 					}
@@ -65,12 +65,12 @@ public class Othello extends Game {
 		return flipped;
 	}
 
-	private boolean isValidMove(int row, int column) {
-		if (!this.isInBounds(row, column) || !this.isEmpty(row, column)) {
+	private boolean isValidMove(int column, int row) {
+		if (!this.isInBounds(column, row) || !this.isEmpty(column, row)) {
 			return false;
 		}
 
-		if (this.getFlipped(row, column).isEmpty()) {
+		if (this.getFlipped(column, row).isEmpty()) {
 			return false;
 		}
 
@@ -78,31 +78,31 @@ public class Othello extends Game {
 	}
 
 	private boolean hasValidMoves() {
-		for (int y = 0; y < this.height; y++) {
-			for (int x = 0; x < this.width; x++) {
-				if (isValidMove(y, x)) {
+		for (int column = 0; column < this.columns; column++) {
+			for (int row = 0; row < this.rows; row++) {
+				if (isValidMove(column, row)) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-	
-	private void flip(int row, int column) {
-		List<Coordinates> flipped = this.getFlipped(row, column);
+
+	private void flip(int column, int row) {
+		List<Coordinates> flipped = this.getFlipped(column, row);
 
 		for(int i = 0; i < flipped.size(); i++) {
-			this.board[flipped.get(i).row][flipped.get(i).column] = this.currentPlayer;
+			this.board[flipped.get(i).column][flipped.get(i).row] = this.currentPlayer;
 		}
 
-		this.board[row][column] = this.currentPlayer;
+		this.board[column][row] = this.currentPlayer;
 	}
 
 	private int count(int player){
 		int count = 0;
-		for (int y = 0; y < this.height; y++) {
-			for (int x = 0; x < this.width; x++) {
-				if (this.board[y][x] == player) {
+		for (int column = 0; column < this.columns; column++) {
+			for (int row = 0; row < this.rows; row++) {
+				if (this.board[column][row] == player) {
 					count++;
 				}
 			}
