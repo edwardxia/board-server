@@ -115,90 +115,84 @@ public class Checkers extends Game {
     }
     
     public boolean isJump(Coordinates movefrom, Coordinates moveto) {
-    	if (isInBounds(movefrom.row, movefrom.column) && isInBounds(moveto.row, moveto.column)) {
-			if (board[movefrom.row][movefrom.column]==currentPlayer && board[moveto.row][moveto.column]==-1) {
-			    // Checks case of a jump
-			    if (Math.abs(movefrom.column-moveto.column)==2) {
-					if (currentPlayer == red && (moveto.row - movefrom.row == 2) && 
-					    (board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == black || board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == blackKing))
-						return true;
-					if (currentPlayer == black && (moveto.row - movefrom.row == -2) && 
-					    (board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == red || board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == redKing))
-						return true;
-					if (currentPlayer == red && board[movefrom.row][movefrom.column] == redKing && (moveto.row - movefrom.row == 2) && 
-							(board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == black || board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == blackKing)) {
-						return true;
-					}
-					if (currentPlayer == red && board[movefrom.row][movefrom.column] == redKing && (moveto.row - movefrom.row == -2) && 
-							(board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == black || board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == blackKing)) {
-						return true;
-					}
-					if (currentPlayer == black && board[movefrom.row][movefrom.column] == blackKing && (moveto.row - movefrom.row == 2) && 
-							(board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == red || board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == redKing)) {
-						return true;
-					}
-					if (currentPlayer == black && board[movefrom.row][movefrom.column] == blackKing && (moveto.row - movefrom.row == -2) && 
-							(board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == red || board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == redKing)) {
-						return true;
-					}
-			    }
-			}
-    	} return false;
+		if (board[movefrom.row][movefrom.column]==currentPlayer && board[moveto.row][moveto.column]==-1) {
+		    if (Math.abs(movefrom.column-moveto.column)==2) {
+				if (currentPlayer == red && (moveto.row - movefrom.row == 2) && 
+				    (board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == black || board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == blackKing))
+					return true;
+				if (currentPlayer == black && (moveto.row - movefrom.row == -2) && 
+				    (board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == red || board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == redKing))
+					return true;
+				if (currentPlayer == red && board[movefrom.row][movefrom.column] == redKing && (moveto.row - movefrom.row == 2) && 
+						(board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == black || board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == blackKing)) {
+					return true;
+				}
+				if (currentPlayer == red && board[movefrom.row][movefrom.column] == redKing && (moveto.row - movefrom.row == -2) && 
+						(board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == black || board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == blackKing)) {
+					return true;
+				}
+				if (currentPlayer == black && board[movefrom.row][movefrom.column] == blackKing && (moveto.row - movefrom.row == 2) && 
+						(board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == red || board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == redKing)) {
+					return true;
+				}
+				if (currentPlayer == black && board[movefrom.row][movefrom.column] == blackKing && (moveto.row - movefrom.row == -2) && 
+						(board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == red || board[(movefrom.row+moveto.row)/2][(movefrom.column+moveto.column)/2] == redKing)) {
+					return true;
+				}
+		    }
+		} return false;
+	} return false;
     }
 			    
     public boolean isSimpleMove(Coordinates movefrom, Coordinates moveto) {
-    	if (isInBounds(movefrom.row, movefrom.column) && isInBounds(moveto.row, moveto.column)) {
-			if (board[moveto.row][moveto.column]==-1) {
-			    if (Math.abs(movefrom.column-moveto.column)==1) {
-					if (board[movefrom.row][movefrom.column]==currentPlayer && (currentPlayer == red) && (moveto.row - movefrom.row == 1)){
-						return true;}
-					if (board[movefrom.row][movefrom.column]==currentPlayer && (currentPlayer == black) && (moveto.row - movefrom.row == -1))
-						return true;
-					if (board[movefrom.row][movefrom.column]==redKing && (currentPlayer == red) && (moveto.row - movefrom.row == 1)){
-						return true;}
-					if (board[movefrom.row][movefrom.column]==redKing &&(currentPlayer == red) && (moveto.row - movefrom.row == -1))
-						return true;
-					if (board[movefrom.row][movefrom.column]==blackKing && (currentPlayer == black) && (moveto.row - movefrom.row == 1)){
-						return true;}
-					if (board[movefrom.row][movefrom.column]==blackKing &&(currentPlayer == black) && (moveto.row - movefrom.row == -1))
-						return true;
-			    }
-			}
-    	} return false;
-    }
+		if (board[moveto.row][moveto.column]==-1) {
+		    if (Math.abs(movefrom.column-moveto.column)==1) {
+				if (board[movefrom.row][movefrom.column]==currentPlayer && (currentPlayer == red) && (moveto.row - movefrom.row == 1)){
+					return true;}
+				if (board[movefrom.row][movefrom.column]==currentPlayer && (currentPlayer == black) && (moveto.row - movefrom.row == -1))
+					return true;
+				if (board[movefrom.row][movefrom.column]==redKing && (currentPlayer == red) && (moveto.row - movefrom.row == 1)){
+					return true;}
+				if (board[movefrom.row][movefrom.column]==redKing &&(currentPlayer == red) && (moveto.row - movefrom.row == -1))
+					return true;
+				if (board[movefrom.row][movefrom.column]==blackKing && (currentPlayer == black) && (moveto.row - movefrom.row == 1)){
+					return true;}
+				if (board[movefrom.row][movefrom.column]==blackKing &&(currentPlayer == black) && (moveto.row - movefrom.row == -1))
+					return true;
+		    }
+		} return false;
+	} 
     
     public boolean checkJumpMoves() {
     	//is there a jump move
     	for (int i=0; allMoves.length>i; i++) {
     		for (int j=0; allMoves.length>j; j++) {
     			// Gets array indeces corresponding to the move, from parameters.
-    			if (isInBounds(allMoves[i].row, allMoves[i].column) && isInBounds(allMoves[j].row, allMoves[j].column)) {
-    				if (board[allMoves[j].row][allMoves[j].column]==-1) {
-    				    // Checks case of a jump
-    				    if (Math.abs(allMoves[i].column-allMoves[j].column)==2) {
-    						if (board[allMoves[i].row][allMoves[i].column]==currentPlayer && currentPlayer == red && (allMoves[j].row - allMoves[i].row == 2) && 
-    						    (board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == black  || board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == blackKing))
+				if (board[allMoves[j].row][allMoves[j].column]==-1) {
+				    // Checks case of a jump
+				    if (Math.abs(allMoves[i].column-allMoves[j].column)==2) {
+						if (board[allMoves[i].row][allMoves[i].column]==currentPlayer && currentPlayer == red && (allMoves[j].row - allMoves[i].row == 2) && 
+						    (board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == black  || board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == blackKing))
+							return true;
+						if (board[allMoves[i].row][allMoves[i].column]==currentPlayer && currentPlayer == black && (allMoves[j].row - allMoves[i].row == -2) && 
+						    (board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == red  || board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == redKing))
+							return true;
+						//redKing
+						if (board[allMoves[i].row][allMoves[i].column]==redKing && currentPlayer == red && (allMoves[j].row - allMoves[i].row == 2) && 
+								(board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == black  || board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == blackKing))
     							return true;
-    						if (board[allMoves[i].row][allMoves[i].column]==currentPlayer && currentPlayer == black && (allMoves[j].row - allMoves[i].row == -2) && 
+    					if (board[allMoves[i].row][allMoves[i].column]==redKing && currentPlayer == red && (allMoves[j].row - allMoves[i].row == -2) && 
+    						    (board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == black || board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == blackKing))
+    							return true;
+						//blackKing
+    					if (board[allMoves[i].row][allMoves[i].column]==blackKing && currentPlayer == black && (allMoves[j].row - allMoves[i].row == 2) && 
+								(board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == red  || board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == redKing))
+    							return true;
+    					if (board[allMoves[i].row][allMoves[i].column]==blackKing && currentPlayer == black && (allMoves[j].row - allMoves[i].row == -2) && 
     						    (board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == red  || board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == redKing))
     							return true;
-    						//redKing
-    						if (board[allMoves[i].row][allMoves[i].column]==redKing && currentPlayer == red && (allMoves[j].row - allMoves[i].row == 2) && 
-    								(board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == black  || board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == blackKing))
-        							return true;
-        					if (board[allMoves[i].row][allMoves[i].column]==redKing && currentPlayer == red && (allMoves[j].row - allMoves[i].row == -2) && 
-        						    (board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == black || board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == blackKing))
-        							return true;
-    						//blackKing
-        					if (board[allMoves[i].row][allMoves[i].column]==blackKing && currentPlayer == black && (allMoves[j].row - allMoves[i].row == 2) && 
-    								(board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == red  || board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == redKing))
-        							return true;
-        					if (board[allMoves[i].row][allMoves[i].column]==blackKing && currentPlayer == black && (allMoves[j].row - allMoves[i].row == -2) && 
-        						    (board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == red  || board[(allMoves[i].row+allMoves[j].row)/2][(allMoves[i].column+allMoves[j].column)/2] == redKing))
-        							return true;
-    				    }
-    				}
-    			}
+				    }
+				}
     		}
     	} return false;
     }
@@ -207,27 +201,25 @@ public class Checkers extends Game {
     	for (int i=0; allMoves.length>i; i++) {
     		for (int j=0; allMoves.length>j; j++) {
     			// Gets array indeces corresponding to the move, from parameters.
-    			if (isInBounds(allMoves[i].row, allMoves[i].column) && isInBounds(allMoves[j].row, allMoves[j].column)) {
-    				if (board[allMoves[j].row][allMoves[j].column]==-1) {
-    					// Checks case of simple move
-    				    if (Math.abs(allMoves[i].column-allMoves[j].column)==1) {
-    						if (board[allMoves[i].row][allMoves[i].column]==currentPlayer && (currentPlayer == red) && (allMoves[j].row - allMoves[i].row == 1))
-    							return true;
-    						if (board[allMoves[i].row][allMoves[i].column]==currentPlayer && (currentPlayer == black) && (allMoves[j].row - allMoves[i].row == -1))
-    							return true;
-    						//redKing
-    						if (board[allMoves[i].row][allMoves[i].column]==redKing && (currentPlayer == red) && (allMoves[j].row - allMoves[i].row == 1))
-    							return true;
-    						if (board[allMoves[i].row][allMoves[i].column]==redKing && (currentPlayer == red) && (allMoves[j].row - allMoves[i].row == -1))
-    							return true;
-    						//blackKing
-    						if (board[allMoves[i].row][allMoves[i].column]==blackKing && (currentPlayer == black) && (allMoves[j].row - allMoves[i].row == 1))
-    							return true;
-    						if (board[allMoves[i].row][allMoves[i].column]==blackKing && (currentPlayer == black) && (allMoves[j].row - allMoves[i].row == -1))
-    							return true;
-    				    }
-    				}
-    			}
+				if (board[allMoves[j].row][allMoves[j].column]==-1) {
+					// Checks case of simple move
+				    if (Math.abs(allMoves[i].column-allMoves[j].column)==1) {
+						if (board[allMoves[i].row][allMoves[i].column]==currentPlayer && (currentPlayer == red) && (allMoves[j].row - allMoves[i].row == 1))
+							return true;
+						if (board[allMoves[i].row][allMoves[i].column]==currentPlayer && (currentPlayer == black) && (allMoves[j].row - allMoves[i].row == -1))
+							return true;
+						//redKing
+						if (board[allMoves[i].row][allMoves[i].column]==redKing && (currentPlayer == red) && (allMoves[j].row - allMoves[i].row == 1))
+							return true;
+						if (board[allMoves[i].row][allMoves[i].column]==redKing && (currentPlayer == red) && (allMoves[j].row - allMoves[i].row == -1))
+							return true;
+						//blackKing
+						if (board[allMoves[i].row][allMoves[i].column]==blackKing && (currentPlayer == black) && (allMoves[j].row - allMoves[i].row == 1))
+							return true;
+						if (board[allMoves[i].row][allMoves[i].column]==blackKing && (currentPlayer == black) && (allMoves[j].row - allMoves[i].row == -1))
+							return true;
+				    }
+				}
     		}
     	} return false;
     }
