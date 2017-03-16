@@ -43,7 +43,6 @@ public class Checkers extends Game {
 		}
 	}
 
-   
     // This method executes one move.
     public void play(int... args){
     	if (args.length >= 4){
@@ -53,12 +52,10 @@ public class Checkers extends Game {
 	if (validMove(movefrom, moveto)) {
 		if (mandatoryMoves.size() == 0){
 			executeMove(movefrom, moveto);
-		    	printBoard();
 			next();
 		 }
 		if (mandatoryMoves.size() != 0) {
 			executeMove(movefrom, moveto);
-			printBoard();
 		}
 	}
     }
@@ -140,7 +137,6 @@ public class Checkers extends Game {
 					return true;
 				}
 		    }
-		} return false;
 	} return false;
     }
 			    
