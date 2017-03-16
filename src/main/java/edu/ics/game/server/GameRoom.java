@@ -119,7 +119,7 @@ public class GameRoom {
 	}
 
 	public void wait(GamePlayer player) {
-		if (this.getStatus() == GameRoomPlayerStatus.WAITING && this.getPlayersWaiting() < this.getPlayersMax()) {
+		if (this.getStatus() == GameRoomPlayerStatus.WAITING && this.getPlayersWaiting() + this.getPlayersReady() < this.getPlayersMax()) {
 			this.playerStatus.put(player, GameRoomPlayerStatus.WAITING);
 			this.sortPlayersByStatus();
 		}
