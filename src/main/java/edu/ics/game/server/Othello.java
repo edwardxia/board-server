@@ -8,10 +8,10 @@ public class Othello extends Game {
 		super(8, 8);
 
 		// initialize board pieces
-		this.board[3][3] = 0;
-		this.board[3][4] = 1;
-		this.board[4][3] = 1;
-		this.board[4][4] = 0;
+		this.board[3][3] = 1;
+		this.board[3][4] = 0;
+		this.board[4][3] = 0;
+		this.board[4][4] = 1;
 	}
 
 	public void play(int... args) {
