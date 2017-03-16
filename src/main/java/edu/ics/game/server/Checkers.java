@@ -50,76 +50,62 @@ public class Checkers extends Game {
     		movefrom = new Coordinates(args[1], args[0]);
     		moveto = new Coordinates(args[3], args[2]);
     	}
-		boolean moved = false;
-		// Loops until legal move is entered.
-		while (!moved) {
-		    // Checks to see if move is valid, if so, executes it.
-		    if (mandatoryMoves.size() >0) {
-		    	//take the mandatory jump
-		    	for(int i=0; i<mandatoryMoves.size(); i++){
-			    	if(mandatoryMoves.get(i).row == moveto.row && mandatoryMoves.get(i).column == moveto.column){
-			    		executeMove(movefrom, moveto);
-			    		mandatoryMoves.clear();
-			    		moved = true;
-			    	} 
-		    	}
-		    }
-		    if (mandatoryMoves.size() == 0 && validMove(movefrom,moveto)) {
-		    	if (isJump(movefrom,moveto)) {
-		    		executeMove(movefrom,moveto);
-		    		if (currentPlayer == 0){
-		    			Coordinates newmove1 = new Coordinates(moveto.row+2, moveto.column+2);
-		    			Coordinates newmove2 = new Coordinates(moveto.row+2, moveto.column-2);
-		    			if (isJump(moveto, newmove1)) {
-		    				mandatoryMoves.add(newmove1);
-		    			}
-		    			if (isJump(moveto, newmove2)) {
-		    				mandatoryMoves.add(newmove2);
-		    			}
-		    		}
-		    		if (currentPlayer == 1){
-		    			Coordinates newmove1 = new Coordinates(moveto.row-2, moveto.column-2);
-		    			Coordinates newmove2 = new Coordinates(moveto.row-2, moveto.column+2);
-		    			if (isJump(moveto, newmove1)) {
-		    				mandatoryMoves.add(newmove1);
-		    			}
-		    			if (isJump(moveto, newmove2)) {
-		    				mandatoryMoves.add(newmove2);
-		    			}
-		    		}
-		    	if (mandatoryMoves.size() == 0){
-			    		moved = true;
-		    	}
-		    }
-		    if (isSimpleMove(movefrom, moveto)){
-		    	executeMove(movefrom, moveto);
-		    	moved = true;
-		    }
-		    else if (mandatoryMoves.size() == 0){
-		    	System.out.println("You have a mandatory move, try again.");
-		    }
-
-		    }
-		// Update currentPlayer
+	if (validMove(movefrom, moveto)) {
+		if (mandatoryMoves.size() == 0){
+			executeMove(movefrom, moveto);
+		    	printBoard();
+			next();
+		 }
+		if (mandatoryMoves.size() != 0) {
+			executeMove(movefrom, moveto);
+			printBoard();
 		}
-		next();
+	}
     }
 
     // Checks if a move is valid.
     public boolean validMove(Coordinates movefrom, Coordinates moveto) {
-		if (!isInBounds(movefrom.row, movefrom.column)) {
+    	if (!isInBounds(movefrom.row, movefrom.column)) {
 			return false;
 		}
 		if (!isInBounds(moveto.row, moveto.column)) {
 			return false;
 		}
 		if (checkJumpMoves()){
+			if (mandatoryMoves.size() >0) {
+	    		for(int i=0; i<mandatoryMoves.size(); i++){
+			    	if(mandatoryMoves.get(i).row == moveto.row && mandatoryMoves.get(i).column == moveto.column){
+			    		mandatoryMoves.clear();
+			    		return true;
+			    	}
+	    		} return false;
+	    	}
 			if (isJump(movefrom, moveto)){
+				if (currentPlayer == red){
+	    			Coordinates newmove1 = new Coordinates(moveto.row+2, moveto.column+2);
+	    			Coordinates newmove2 = new Coordinates(moveto.row+2, moveto.column-2);
+	    			if (isInBounds(newmove1.row, newmove1.column) && isJump(moveto, newmove1)) {
+	    				mandatoryMoves.add(newmove1);
+	    			}
+	    			if (isInBounds(newmove2.row, newmove2.column) && isJump(moveto, newmove2)) {
+	    				mandatoryMoves.add(newmove2);
+	    			}
+	    		}
+	    		if (currentPlayer == black){
+	    			Coordinates newmove1 = new Coordinates(moveto.row-2, moveto.column-2);
+	    			Coordinates newmove2 = new Coordinates(moveto.row-2, moveto.column+2);
+	    			if (isInBounds(newmove1.row, newmove1.column) && isJump(moveto, newmove1)) {
+	    				mandatoryMoves.add(newmove1);
+	    			}
+	    			if (isInBounds(newmove2.row, newmove2.column) && isJump(moveto, newmove2)) {
+	    				mandatoryMoves.add(newmove2);
+	    			}
+	    		}
 				return true;
 			}
 			return false; 
 		}
-		if (checkSimpleMoves()){
+		if (mandatoryMoves.size() == 0 && checkSimpleMoves()){
 			if (isSimpleMove(movefrom, moveto)){
 				return true;
 			}
