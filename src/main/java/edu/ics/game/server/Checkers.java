@@ -61,10 +61,6 @@ public class Checkers extends Game {
 		return this.board.get(column).get(row);
 	}
 
-	protected CheckersPiece getPiece(Coordinates coordinates) {
-		return this.getPiece(coordinates.column, coordinates.row);
-	}
-
 	public void play(int... args){
 		if (args.length >= 2) {
 			int column = args[0];
