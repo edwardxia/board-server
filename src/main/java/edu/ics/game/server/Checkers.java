@@ -1,5 +1,7 @@
 package edu.ics.game.server;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Checkers extends Game {
 	private List<List<CheckersPiece>> board; 
