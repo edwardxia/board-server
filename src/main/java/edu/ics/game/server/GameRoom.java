@@ -67,7 +67,7 @@ public class GameRoom {
 
 	public void addPlayer(GamePlayer player) {
 		this.players.add(player);
-		if (this.getStatus() == GameRoomPlayerStatus.PLAYING || this.getPlayersReady() + this.getPlayersWaiting() > this.getPlayersMax()) {
+		if (this.getStatus() == GameRoomPlayerStatus.PLAYING || this.getPlayersReady() + this.getPlayersWaiting() >= this.getPlayersMax()) {
 			this.playerStatus.put(player, GameRoomPlayerStatus.WATCHING);
 		} else {
 			this.playerStatus.put(player, GameRoomPlayerStatus.WAITING);
