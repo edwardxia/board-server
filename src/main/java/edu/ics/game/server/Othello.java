@@ -18,6 +18,10 @@ public class Othello extends Game {
 		if (args.length >= 2) {
 			int column = args[0];
 			int row = args[1];
+			
+			if (!isInBounds(column, row)) {
+				return;
+			}
 
 			if (isValidMove(column, row)) {
 				this.flip(column, row);

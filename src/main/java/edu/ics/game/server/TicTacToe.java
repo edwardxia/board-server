@@ -9,6 +9,10 @@ public class TicTacToe extends Game {
 		if (args.length >= 2) {
 			int column = args[0];
 			int row = args[1];
+			
+			if (!isInBounds(column, row)) {
+				return;
+			}
 
 			if (this.isEmpty(column, row)) {
 				this.board[column][row] = this.currentPlayer;

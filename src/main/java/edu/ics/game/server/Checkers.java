@@ -2,290 +2,207 @@ package edu.ics.game.server;
 import java.util.*;
 
 public class Checkers extends Game {
-	private int redcheckers; // Number of red checkers on the board
-	private int blackcheckers; // Number of black checkers on the board
-	private int red = 0;
-	private int black = 1;
-	private int redKing = 2;
-	private int blackKing = 3;
-	private ArrayList<Coordinates> mandatoryMoves = new ArrayList<Coordinates>();
-	private Coordinates[] allMoves = new Coordinates[64];
-	private Coordinates movefrom;
-	private Coordinates moveto;
+	private List<List<CheckersPiece>> board; 
+	private Coordinates selectedCoordinates = null;
+	private boolean mandatoryMove = false;
 
 	protected Checkers() {
-		super(8,8);
-		this.redcheckers = 12;
-		this.blackcheckers = 12;
+		this.columns = 8;
+		this.rows = 8;
 
-		int column, row;
-		for (column = 0; column < this.columns; column++) {
-			for (row = 0; row < this.rows; row++) {
-				this.board[column][row] = -1;
+		this.board = new ArrayList<>(this.columns);
+		for (int column = 0; column < this.columns; column++) {
+			this.board.add(column, new ArrayList<>(this.rows));
+			for (int row = 0; row < this.rows; row++) {
+				this.board.get(column).add(row, null);
 			}
 		}
 
-		for (row = this.rows - 3; row < this.rows; row++) {
-			for (column = 0; column < this.columns; column += 1) {
+		for (int column = 0; column < this.columns; column++) {
+			for (int row = 0; row < rows; row++) {
 				if ((row + column) % 2 == 1) {
-					this.board[column][row] = 0;
-
+					if (row < 3){
+						this.setPiece(column, row, new CheckersPiece(1));
+					} else if (row > 4) {
+						this.setPiece(column, row, new CheckersPiece(0));
+					}
 				}
 			} 
-		}
-
-		for (row = 0; row < 3; row++) {
-			for (column = 0; column < this.columns; column += 1) {
-				if ((row + column) % 2 == 1) {
-					this.board[column][row] = 1;
-
-				}
-			} 
-		}
-
-		int counter = 0;
-		for (row = 0; row < this.rows; row++) {
-			for (column = 0; column < this.columns; column++) {
-				allMoves[counter] = new Coordinates(column, row);
-				counter++;
-			}
 		}
 	}
 
-	// This method executes one move.
+	public int[][] getBoard() {
+		int[][] board = new int[8][8];
+		for (int column = 0; column < this.columns; column += 1) {
+			for (int row = 0; row < this.rows; row++) {
+				CheckersPiece piece = this.getPiece(column, row);
+				if (piece == null) {
+					board[column][row] = -1;
+				} else {
+					board[column][row] = piece.getInt();
+					if (this.selectedCoordinates != null && this.selectedCoordinates.column == column && this.selectedCoordinates.row == row) {
+						board[column][row] += 4;
+					}
+				}
+			} 
+		} 		
+		return board;
+	}
+
+	protected boolean isEmpty(int column, int row) {
+		return this.isInBounds(column, row) && this.getPiece(column, row) == null;
+	}
+
+	protected void setPiece(int column, int row, CheckersPiece piece) {
+		this.board.get(column).set(row, piece);
+	}
+
+	protected CheckersPiece getPiece(int column, int row) {
+		return this.board.get(column).get(row);
+	}
+
+	protected CheckersPiece getPiece(Coordinates coordinates) {
+		return this.getPiece(coordinates.column, coordinates.row);
+	}
+
 	public void play(int... args){
-		if (args.length >= 4){
-			movefrom = new Coordinates(args[0], args[1]);
-			moveto = new Coordinates(args[2], args[3]);
-		}
-		if (validMove(movefrom, moveto)) {
-			if (mandatoryMoves.size() == 0){
-				executeMove(movefrom, moveto);
-				next();
+		if (args.length >= 2) {
+			int column = args[0];
+			int row = args[1];
+
+			if (!isInBounds(column, row)) {
+				return;
 			}
-			if (mandatoryMoves.size() != 0) {
-				executeMove(movefrom, moveto);
+
+			if (this.selectedCoordinates != null) {
+				if (this.mandatoryMove || !this.select(column, row)) {
+					if (this.move(this.selectedCoordinates.column, this.selectedCoordinates.row, column, row)) {
+						if (this.count(this.getOpponentPlayer()) == 0) {
+							this.ended = true;
+							this.winner = this.getCurrentPlayer();
+						} else {
+							this.next();
+						}
+					}
+				}
+			} else {
+				this.select(column, row);
 			}
 		}
 	}
 
-	// Checks if a move is valid.
-	public boolean validMove(Coordinates movefrom, Coordinates moveto) {
-		if (!isInBounds(movefrom.column, movefrom.row)) {
-			return false;
-		}
-		if (!isInBounds(moveto.column, moveto.row)) {
-			return false;
-		}
-		if (checkJumpMoves()){
-			if (mandatoryMoves.size() >0) {
-				for(int i=0; i<mandatoryMoves.size(); i++){
-					if(mandatoryMoves.get(i).row == moveto.row && mandatoryMoves.get(i).column == moveto.column){
-						mandatoryMoves.clear();
-						return true;
-					}
-				} return false;
-			}
-			if (isJump(movefrom, moveto)){
-				if (currentPlayer == red){
-					Coordinates newmove1 = new Coordinates(moveto.column+2, moveto.row+2);
-					Coordinates newmove2 = new Coordinates(moveto.column-2, moveto.row+2);
-					if (isInBounds(newmove1.column, newmove1.row) && isJump(moveto, newmove1)) {
-						mandatoryMoves.add(newmove1);
-					}
-					if (isInBounds(newmove2.column, newmove2.row) && isJump(moveto, newmove2)) {
-						mandatoryMoves.add(newmove2);
-					}
-				}
-				if (currentPlayer == black){
-					Coordinates newmove1 = new Coordinates(moveto.column-2, moveto.row-2);
-					Coordinates newmove2 = new Coordinates(moveto.column+2, moveto.row-2);
-					if (isInBounds(newmove1.column, newmove1.row) && isJump(moveto, newmove1)) {
-						mandatoryMoves.add(newmove1);
-					}
-					if (isInBounds(newmove2.column, newmove2.row) && isJump(moveto, newmove2)) {
-						mandatoryMoves.add(newmove2);
-					}
-				}
-				return true;
-			}
-			return false; 
-		}
-		if (mandatoryMoves.size() == 0 && checkSimpleMoves()){
-			if (isSimpleMove(movefrom, moveto)){
-				return true;
-			}
-			return false;
+	private boolean select(int column, int row) {
+		CheckersPiece piece = this.getPiece(column, row);
+		if (piece != null && piece.getPlayerIndex() == currentPlayer) {
+			this.selectedCoordinates = new Coordinates(column, row);
+			return true;
 		}
 		return false;
 	}
 
-	public boolean isJump(Coordinates movefrom, Coordinates moveto) {
-		if (board[movefrom.column][movefrom.row]==currentPlayer && board[moveto.column][moveto.row]==-1) {
-			if (Math.abs(movefrom.column-moveto.column)==2) {
-				if (currentPlayer == red && (moveto.row - movefrom.row == 2) && 
-						(board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] == black || board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] == blackKing))
-					return true;
-				if (currentPlayer == black && (moveto.row - movefrom.row == -2) && 
-						(board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] == red || board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] == redKing))
-					return true;
-				if (currentPlayer == red && board[movefrom.column][movefrom.row] == redKing && (moveto.row - movefrom.row == 2) && 
-						(board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] == black || board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] == blackKing)) {
-					return true;
-				}
-				if (currentPlayer == red && board[movefrom.column][movefrom.row] == redKing && (moveto.row - movefrom.row == -2) && 
-						(board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] == black || board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] == blackKing)) {
-					return true;
-				}
-				if (currentPlayer == black && board[movefrom.column][movefrom.row] == blackKing && (moveto.row - movefrom.row == 2) && 
-						(board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] == red || board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] == redKing)) {
-					return true;
-				}
-				if (currentPlayer == black && board[movefrom.column][movefrom.row] == blackKing && (moveto.row - movefrom.row == -2) && 
-						(board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] == red || board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] == redKing)) {
-					return true;
-				}
-			}
-		} return false;
-	}
-
-	public boolean isSimpleMove(Coordinates movefrom, Coordinates moveto) {
-		if (board[moveto.column][moveto.row] == -1) {
-			if (Math.abs(movefrom.column-moveto.column)==1) {
-				if (board[movefrom.column][movefrom.row] == currentPlayer && (currentPlayer == red) && (moveto.row - movefrom.row == 1)){
-					return true;}
-				if (board[movefrom.column][movefrom.row] == currentPlayer && (currentPlayer == black) && (moveto.row - movefrom.row == -1))
-					return true;
-				if (board[movefrom.column][movefrom.row] == redKing && (currentPlayer == red) && (moveto.row - movefrom.row == 1)){
-					return true;}
-				if (board[movefrom.column][movefrom.row] == redKing &&(currentPlayer == red) && (moveto.row - movefrom.row == -1))
-					return true;
-				if (board[movefrom.column][movefrom.row] == blackKing && (currentPlayer == black) && (moveto.row - movefrom.row == 1)){
-					return true;}
-				if (board[movefrom.column][movefrom.row] == blackKing &&(currentPlayer == black) && (moveto.row - movefrom.row == -1))
-					return true;
-			}
-		} return false;
-	} 
-
-	public boolean checkJumpMoves() {
-		//is there a jump move
-		for (int i=0; allMoves.length>i; i++) {
-			for (int j=0; allMoves.length>j; j++) {
-				// Gets array indeces corresponding to the move, from parameters.
-				if (board[allMoves[j].column][allMoves[j].row] == -1) {
-					// Checks case of a jump
-					if (Math.abs(allMoves[i].column-allMoves[j].column)==2) {
-						if (board[allMoves[i].column][allMoves[i].row]==currentPlayer && currentPlayer == red && (allMoves[j].row - allMoves[i].row == 2) && 
-								(board[(allMoves[i].column+allMoves[j].column)/2][(allMoves[i].row+allMoves[j].row)/2] == black  || board[(allMoves[i].column+allMoves[j].column)/2][(allMoves[i].row+allMoves[j].row)/2] == blackKing))
-							return true;
-						if (board[allMoves[i].column][allMoves[i].row]==currentPlayer && currentPlayer == black && (allMoves[j].row - allMoves[i].row == -2) && 
-								(board[(allMoves[i].column+allMoves[j].column)/2][(allMoves[i].row+allMoves[j].row)/2] == red  || board[(allMoves[i].column+allMoves[j].column)/2][(allMoves[i].row+allMoves[j].row)/2] == redKing))
-							return true;
-						//redKing
-						if (board[allMoves[i].column][allMoves[i].row]==redKing && currentPlayer == red && (allMoves[j].row - allMoves[i].row == 2) && 
-								(board[(allMoves[i].column+allMoves[j].column)/2][(allMoves[i].row+allMoves[j].row)/2] == black  || board[(allMoves[i].column+allMoves[j].column)/2][(allMoves[i].row+allMoves[j].row)/2] == blackKing))
-							return true;
-						if (board[allMoves[i].column][allMoves[i].row]==redKing && currentPlayer == red && (allMoves[j].row - allMoves[i].row == -2) && 
-								(board[(allMoves[i].column+allMoves[j].column)/2][(allMoves[i].row+allMoves[j].row)/2] == black || board[(allMoves[i].column+allMoves[j].column)/2][(allMoves[i].row+allMoves[j].row)/2] == blackKing))
-							return true;
-						//blackKing
-						if (board[allMoves[i].column][allMoves[i].row]==blackKing && currentPlayer == black && (allMoves[j].row - allMoves[i].row == 2) && 
-								(board[(allMoves[i].column+allMoves[j].column)/2][(allMoves[i].row+allMoves[j].row)/2] == red  || board[(allMoves[i].column+allMoves[j].column)/2][(allMoves[i].row+allMoves[j].row)/2] == redKing))
-							return true;
-						if (board[allMoves[i].column][allMoves[i].row]==blackKing && currentPlayer == black && (allMoves[j].row - allMoves[i].row == -2) && 
-								(board[(allMoves[i].column+allMoves[j].column)/2][(allMoves[i].row+allMoves[j].row)/2] == red  || board[(allMoves[i].column+allMoves[j].column)/2][(allMoves[i].row+allMoves[j].row)/2] == redKing))
-							return true;
-					}
-				}
-			}
-		} return false;
-	}
-
-	public boolean checkSimpleMoves() {
-		for (int i=0; allMoves.length>i; i++) {
-			for (int j=0; allMoves.length>j; j++) {
-				// Gets array indeces corresponding to the move, from parameters.
-				if (board[allMoves[j].column][allMoves[j].row] == -1) {
-					// Checks case of simple move
-					if (Math.abs(allMoves[i].column-allMoves[j].column)==1) {
-						if (board[allMoves[i].column][allMoves[i].row]==currentPlayer && (currentPlayer == red) && (allMoves[j].row - allMoves[i].row == 1))
-							return true;
-						if (board[allMoves[i].column][allMoves[i].row]==currentPlayer && (currentPlayer == black) && (allMoves[j].row - allMoves[i].row == -1))
-							return true;
-						//redKing
-						if (board[allMoves[i].column][allMoves[i].row]==redKing && (currentPlayer == red) && (allMoves[j].row - allMoves[i].row == 1))
-							return true;
-						if (board[allMoves[i].column][allMoves[i].row]==redKing && (currentPlayer == red) && (allMoves[j].row - allMoves[i].row == -1))
-							return true;
-						//blackKing
-						if (board[allMoves[i].column][allMoves[i].row]==blackKing && (currentPlayer == black) && (allMoves[j].row - allMoves[i].row == 1))
-							return true;
-						if (board[allMoves[i].column][allMoves[i].row]==blackKing && (currentPlayer == black) && (allMoves[j].row - allMoves[i].row == -1))
-							return true;
-					}
-				}
-			}
-		} return false;
-	}
-
-
-	// Executes a move.
-	public void executeMove(Coordinates movefrom, Coordinates moveto) {
-		// Gets array indeces corresponding to the move, from parameters.
-		// Change appropriate board elements and decrement redcheckers or
-		// blackcheckers if necessary. 	
-		if (currentPlayer == red) {
-			if (board[movefrom.column][movefrom.row] == redKing) {
-				this.board[moveto.column][moveto.row] = redKing;
-			}
-			if (moveto.row == 7) {
-				this.board[moveto.column][moveto.row] = redKing;
-			} 
-			if (moveto.row != 0 && board[movefrom.column][movefrom.row] != redKing){
-				this.board[moveto.column][moveto.row] = red;
-			}
-		} else {
-			if (board[movefrom.column][movefrom.row] == blackKing){
-				this.board[moveto.column][moveto.row] = blackKing;
-			}
-			if (moveto.row == 0) {
-				this.board[moveto.column][moveto.row] = blackKing;
-			}
-			if (moveto.row != 0  && board[movefrom.column][movefrom.row] != blackKing){
-				this.board[moveto.column][moveto.row] = black;
-			}		
-		} // end while
-		this.board[movefrom.column][movefrom.row] = -1;
-		if (Math.abs(moveto.column - movefrom.column) == 2) {
-			this.board[(movefrom.column+moveto.column)/2][(movefrom.row+moveto.row)/2] = -1;
-			if (currentPlayer == red)
-				redcheckers--;
-			else
-				blackcheckers--;
-		} 
-	}
-
-	public boolean gameOver() {
-		//no move left, player who still has moves wins
-		if (!checkSimpleMoves() && !checkJumpMoves()){
-			if (currentPlayer == red) {
-				this.winner = 1;
-				this.ended = true;
-				return true;}
-			else if (currentPlayer == black) {
-				this.winner = 0;
-				this.ended = true;
-				return true;}
+	private boolean move(int oldColumn, int oldRow, int newColumn, int newRow) {
+		int _c = newColumn - oldColumn, _r = newRow - oldRow;
+		if (Math.abs(_r) > 2 || Math.abs(_r) <=0 || Math.abs(_c) != Math.abs(_r) || !isEmpty(newColumn, newRow) || (mandatoryMove && Math.abs(_r) == 1)) {
+			return false;
 		}
-		//player has no checkers left
-		if (blackcheckers == 0)
-			this.winner = 0;
-		this.ended = true;
-		if (redcheckers == 0)
-			this.winner = 1;
-		this.ended = true;
-		return (redcheckers == 0 || blackcheckers == 0);
+		CheckersPiece piece = this.getPiece(oldColumn, oldRow);
+		if (piece.getType() == CheckersPiece.MEN && ((piece.getPlayerIndex() == 0 && _r > 0) || (piece.getPlayerIndex() == 1 && _r < 0))) {
+			return false;
+		}
+		if (Math.abs(_r) == 2) {
+			CheckersPiece middlePiece = this.getPiece(oldColumn + _c / 2, oldRow + _r / 2);
+			if (middlePiece == null || middlePiece.getPlayerIndex() == currentPlayer) {
+				return false;
+			}
+			this.selectedCoordinates = null;
+			this.setPiece(oldColumn, oldRow, null);
+			this.setPiece(oldColumn + _c / 2, oldRow + _r / 2, null);
+			this.setPiece(newColumn, newRow, piece);
+
+			if (this.hasMandatoryMoves(newColumn, newRow)) {
+				this.mandatoryMove = true;
+				this.selectedCoordinates = new Coordinates(newColumn, newRow);
+				return false;
+			}
+
+			this.mandatoryMove = false;
+		} else if (Math.abs(_r) == 1) {
+			this.selectedCoordinates = null;
+			this.setPiece(oldColumn, oldRow, null);
+			this.setPiece(newColumn, newRow, piece);
+		}
+
+		if ((piece.getPlayerIndex() == 0 && newRow == 0) || (piece.getPlayerIndex() == 1 && newRow == this.rows - 1)) {
+			piece.promote();
+		}
+		return true;
 	}
 
+	private boolean hasMandatoryMoves(int column, int row) {
+		int[] rowDirections = {}, columnDirections = {-1, 1};
+		if (this.getPiece(column, row).getType() == CheckersPiece.KING) {
+			rowDirections = new int[]{-1, 1};
+		} else if (this.getPiece(column, row).getPlayerIndex() == 0) {
+			rowDirections = new int[]{-1};
+		} else if (this.getPiece(column, row).getPlayerIndex() == 1) {
+			rowDirections = new int[]{1};
+		}
+		for (int _c : columnDirections) {
+			for (int _r : rowDirections) {
+				if (this.isInBounds(column + _c * 2, row + _r * 2) && this.getPiece(column + _c * 2, row + _r * 2) == null) {
+					CheckersPiece piece = this.getPiece(column + _c, row + _r);
+					if (piece != null && piece.getPlayerIndex() == this.getOpponentPlayer()) {
+						return true;
+					}
+				}
+			}	
+		}
+		return false;
+	}
+
+	private int count(int player){
+		int count = 0;
+		for (int column = 0; column < this.columns; column++) {
+			for (int row = 0; row < this.rows; row++) {
+				CheckersPiece piece = this.getPiece(column, row);
+				if (piece != null && this.getPiece(column, row).getPlayerIndex() == player) {
+					count++;
+				}
+			}
+		}
+		return count;
+	}
+
+	private int getOpponentPlayer(){
+		return this.getNextPlayer();
+	}
+
+	public class CheckersPiece {
+		public static final int MEN = 0;
+		public static final int KING = 1;
+
+		private int playerIndex;
+		private int type;
+
+		public CheckersPiece(int playerIndex) {
+			this.playerIndex = playerIndex;
+			this.type = MEN;
+		}
+
+		public void promote() {
+			this.type = KING;
+		}
+
+		public int getPlayerIndex() {
+			return playerIndex;
+		}
+
+		public int getType() {
+			return type;
+		}
+
+		public int getInt() {
+			return 2 * playerIndex + type;
+		}
+	}
 }

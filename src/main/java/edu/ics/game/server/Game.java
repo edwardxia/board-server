@@ -30,6 +30,8 @@ public abstract class Game {
 	protected int rows;
 	protected int[][] board;
 
+	protected Game() {}
+
 	protected Game(int columns, int rows) {
 		this.ended = false;
 		this.columns = columns;
@@ -77,10 +79,7 @@ public abstract class Game {
 	}
 
 	protected boolean isEmpty(int column, int row) {
-		if (this.isInBounds(column, row) && this.board[column][row] == -1) {
-			return true;
-		}
-		return false;
+		return this.isInBounds(column, row) && this.board[column][row] == -1;
 	}
 
 	public boolean isEnded() {
