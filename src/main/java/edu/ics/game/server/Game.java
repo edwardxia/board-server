@@ -49,8 +49,8 @@ public abstract class Game {
 
 		state.put("name", this.getClass().getSimpleName());
 
-		state.put("height", this.rows);
-		state.put("width", this.columns);
+		state.put("rows", this.rows);
+		state.put("columns", this.columns);
 
 		ArrayNode boardState = state.putArray("board");
 
