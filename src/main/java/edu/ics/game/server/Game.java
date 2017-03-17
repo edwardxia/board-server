@@ -11,9 +11,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class Game {
 	public static final List<Class<? extends Game>> AVAILABLE_GAMES = new ArrayList<>(Arrays.asList(
-			TicTacToe.class,
 			Checkers.class,
-			Othello.class
+			Othello.class,
+			TicTacToe.class
 			));
 
 
