@@ -12,6 +12,7 @@ import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Server {
 	private SocketIOServer server;
@@ -178,7 +179,16 @@ public class Server {
 					}
 					if (room != null) {
 						room.ready(lobby.getPlayerByUUID(client.getSessionId()));
-						namespace.getRoomOperations(room.getName()).sendEvent("room", room.getState());
+
+						if (room.getStatus() == GameRoomPlayerStatus.PLAYING) {
+							for (int i = 0; i < room.getPlayers().size(); i++) {
+								ObjectNode roomState = (ObjectNode)room.getState();
+								roomState.put("playerIndex", i);
+								namespace.getClient(room.getPlayers().get(i).getUuid()).sendEvent("room", roomState);
+							}
+						} else {
+							namespace.getRoomOperations(room.getName()).sendEvent("room", room.getState());
+						}
 					}
 
 					namespace.getBroadcastOperations().sendEvent("lobby", lobby.getState());
