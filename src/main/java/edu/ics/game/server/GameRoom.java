@@ -108,7 +108,7 @@ public class GameRoom {
 	}
 
 	public void ready(GamePlayer player) {
-		if (this.getStatus() == GameRoomPlayerStatus.WAITING && this.playerStatus.get(player) == GameRoomPlayerStatus.WAITING) {
+		if (this.playerStatus.get(player) == GameRoomPlayerStatus.WAITING || (this.getStatus() == GameRoomPlayerStatus.WAITING && this.getPlayersWaiting() + this.getPlayersReady() < this.getPlayersMax())) {
 			this.playerStatus.put(player, GameRoomPlayerStatus.READY);
 			this.sortPlayersByStatus();
 
@@ -119,7 +119,7 @@ public class GameRoom {
 	}
 
 	public void wait(GamePlayer player) {
-		if (this.getStatus() == GameRoomPlayerStatus.WAITING && this.getPlayersWaiting() + this.getPlayersReady() < this.getPlayersMax()) {
+		if (this.playerStatus.get(player) == GameRoomPlayerStatus.READY || (this.getStatus() == GameRoomPlayerStatus.WAITING && this.getPlayersWaiting() + this.getPlayersReady() < this.getPlayersMax())) {
 			this.playerStatus.put(player, GameRoomPlayerStatus.WAITING);
 			this.sortPlayersByStatus();
 		}
