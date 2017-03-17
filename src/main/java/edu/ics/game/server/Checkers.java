@@ -8,7 +8,7 @@ public class Checkers extends Game {
 	private Coordinates selectedCoordinates = null;
 	private boolean mandatoryMove = false;
 
-	protected Checkers() {
+	public Checkers() {
 		this.columns = 8;
 		this.rows = 8;
 
