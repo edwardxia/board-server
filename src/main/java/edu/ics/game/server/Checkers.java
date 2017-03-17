@@ -32,7 +32,7 @@ public class Checkers extends Game {
 	}
 
 	public int[][] getBoard() {
-		int[][] board = new int[8][8];
+		int[][] board = new int[this.columns][this.rows];
 		for (int column = 0; column < this.columns; column += 1) {
 			for (int row = 0; row < this.rows; row++) {
 				CheckersPiece piece = this.getPiece(column, row);
