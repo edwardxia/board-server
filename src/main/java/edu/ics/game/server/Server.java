@@ -231,7 +231,10 @@ public class Server {
 								idx++;
 							};
 							room.play(lobby.getPlayerByUUID(client.getSessionId()), move);
+														
 							namespace.getRoomOperations(room.getName()).sendEvent("room", room.getState());
+							room.turn(lobby.getPlayerByUUID(client.getSessionId()));	
+
 
 							if (room.getStatus() != GameRoomPlayerStatus.PLAYING) {
 								namespace.getBroadcastOperations().sendEvent("lobby", lobby.getState());
