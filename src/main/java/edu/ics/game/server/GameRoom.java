@@ -120,7 +120,9 @@ public class GameRoom {
 	
 	// Changes current player status from TURN to PLAYING
 	public void turn(GamePlayer player) {
-		this.playerStatus.put(this.players.get(this.game.getCurrentPlayer()), GameRoomPlayerStatus.PLAYING);
+		if (this.players.indexOf(player) == this.game.getCurrentPlayer()) {
+			this.playerStatus.put(this.players.get(this.game.getCurrentPlayer()), GameRoomPlayerStatus.PLAYING);
+		}
 	}
 
 	public void wait(GamePlayer player) {
@@ -148,9 +150,8 @@ public class GameRoom {
 		if (this.getStatus() == GameRoomPlayerStatus.PLAYING && this.players.indexOf(player) == this.game.getCurrentPlayer()) {
 			this.game.play(args);
 
-			// Changes player Status to TURN if it's their turn
 			this.playerStatus.put(this.players.get(this.game.getCurrentPlayer()), GameRoomPlayerStatus.TURN);
-			
+				
 			if (this.game.isEnded()) {
 				for (GamePlayer _player : this.players) {
 					if (this.playerStatus.get(_player) == GameRoomPlayerStatus.PLAYING) {
