@@ -117,6 +117,13 @@ public class GameRoom {
 			}
 		}
 	}
+	
+	// Changes current player status from TURN to PLAYING
+	public void turn(GamePlayer player) {
+		if (this.players.indexOf(player) == this.game.getCurrentPlayer()) {
+			this.playerStatus.put(this.players.get(this.game.getCurrentPlayer()), GameRoomPlayerStatus.PLAYING);
+		}
+	}
 
 	public void wait(GamePlayer player) {
 		if (this.playerStatus.get(player) == GameRoomPlayerStatus.READY || (this.getStatus() == GameRoomPlayerStatus.WAITING && this.getPlayersWaiting() + this.getPlayersReady() < this.getPlayersMax())) {
@@ -142,6 +149,9 @@ public class GameRoom {
 	public void play(GamePlayer player, int... args) {
 		if (this.getStatus() == GameRoomPlayerStatus.PLAYING && this.players.indexOf(player) == this.game.getCurrentPlayer()) {
 			this.game.play(args);
+
+			this.playerStatus.put(this.players.get(this.game.getCurrentPlayer()), GameRoomPlayerStatus.TURN);
+				
 			if (this.game.isEnded()) {
 				for (GamePlayer _player : this.players) {
 					if (this.playerStatus.get(_player) == GameRoomPlayerStatus.PLAYING) {
@@ -150,6 +160,7 @@ public class GameRoom {
 				}
 				this.sortPlayersByStatus();
 			}
+			
 		}
 	}
 

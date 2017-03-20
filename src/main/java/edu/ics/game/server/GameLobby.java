@@ -92,7 +92,7 @@ public class GameLobby {
 			if (room.getPlayers().size() == 0) {
 				this.removeRoomByName(name);
 
-				System.out.println("Room '" + name + "' removed because everyone leaved.");
+				System.out.println("Room '" + name + "' removed because everyone left.");
 			}
 		}
 	}
