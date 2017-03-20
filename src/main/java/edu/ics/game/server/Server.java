@@ -233,6 +233,8 @@ public class Server {
 							room.play(lobby.getPlayerByUUID(client.getSessionId()), move);
 														
 							namespace.getRoomOperations(room.getName()).sendEvent("room", room.getState());
+							
+							// changes back from TURN to PLAYING	
 							room.turn(lobby.getPlayerByUUID(client.getSessionId()));	
 
 
