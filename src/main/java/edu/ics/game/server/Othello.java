@@ -2,6 +2,10 @@ package edu.ics.game.server;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class Othello extends Game {
 
 	public Othello() {
@@ -18,7 +22,7 @@ public class Othello extends Game {
 		if (args.length >= 2) {
 			int column = args[0];
 			int row = args[1];
-			
+
 			if (!isInBounds(column, row)) {
 				return;
 			}
@@ -44,6 +48,15 @@ public class Othello extends Game {
 				}
 			}
 		}
+	}
+
+	public JsonNode getState() {
+		ObjectNode state = (ObjectNode)super.getState();
+		ArrayNode score = state.putArray("score");
+		for (int i = 0; i < this.players; i++) {
+			score.add(this.count(i));
+		}
+		return state;
 	}
 
 	private List<Coordinates> getFlipped(int column, int row) {

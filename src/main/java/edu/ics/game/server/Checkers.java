@@ -3,6 +3,10 @@ package edu.ics.game.server;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class Checkers extends Game {
 	private List<List<CheckersPiece>> board; 
 	private Coordinates selectedCoordinates = null;
@@ -87,6 +91,15 @@ public class Checkers extends Game {
 				this.select(column, row);
 			}
 		}
+	}
+
+	public JsonNode getState() {
+		ObjectNode state = (ObjectNode)super.getState();
+		ArrayNode score = state.putArray("score");
+		for (int i = 0; i < this.players; i++) {
+			score.add(this.count(i));
+		}
+		return state;
 	}
 
 	private boolean select(int column, int row) {
