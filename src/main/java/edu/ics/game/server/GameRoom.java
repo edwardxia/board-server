@@ -118,6 +118,7 @@ public class GameRoom {
 		}
 	}
 	
+	// Changes current player status from TURN to PLAYING
 	public void turn(GamePlayer player) {
 		this.playerStatus.put(this.players.get(this.game.getCurrentPlayer()), GameRoomPlayerStatus.PLAYING);
 	}
