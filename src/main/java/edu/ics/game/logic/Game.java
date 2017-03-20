@@ -1,4 +1,4 @@
-package edu.ics.game.server;
+package edu.ics.game.logic;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package edu.ics.game.server;
+package edu.ics.game.logic;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,8 +59,8 @@ public class Othello extends Game {
 		return state;
 	}
 
-	private List<Coordinates> getFlipped(int column, int row) {
-		List<Coordinates> flipped = new ArrayList<>();
+	private List<Coordinate> getFlipped(int column, int row) {
+		List<Coordinate> flipped = new ArrayList<>();
 
 		for (int _r = -1; _r <= 1; _r++) {
 			for (int _c = -1; _c <= 1; _c++) {
@@ -71,7 +71,7 @@ public class Othello extends Game {
 				for (int r = row + _r, c = column + _c; this.isInBounds(c, r) && !this.isEmpty(c, r); r += _r, c += _c) {
 					if (this.board[c][r] == this.currentPlayer) {
 						for (r -= _r, c -= _c; r != row || c != column; r -= _r, c -= _c) {
-							flipped.add(new Coordinates(c, r));
+							flipped.add(new Coordinate(c, r));
 						}
 						break;
 					}
@@ -106,7 +106,7 @@ public class Othello extends Game {
 	}
 
 	private void flip(int column, int row) {
-		List<Coordinates> flipped = this.getFlipped(column, row);
+		List<Coordinate> flipped = this.getFlipped(column, row);
 
 		for(int i = 0; i < flipped.size(); i++) {
 			this.board[flipped.get(i).column][flipped.get(i).row] = this.currentPlayer;

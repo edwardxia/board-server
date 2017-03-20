@@ -1,4 +1,4 @@
-package edu.ics.game.server;
+package edu.ics.game.logic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Checkers extends Game {
 	private List<List<CheckersPiece>> board; 
-	private Coordinates selectedCoordinates = null;
+	private Coordinate selectedCoordinate = null;
 	private boolean mandatoryMove = false;
 
 	public Checkers() {
@@ -46,7 +46,7 @@ public class Checkers extends Game {
 					board[column][row] = -1;
 				} else {
 					board[column][row] = piece.getInt();
-					if (this.selectedCoordinates != null && this.selectedCoordinates.column == column && this.selectedCoordinates.row == row) {
+					if (this.selectedCoordinate != null && this.selectedCoordinate.column == column && this.selectedCoordinate.row == row) {
 						board[column][row] += 4;
 					}
 				}
@@ -76,9 +76,9 @@ public class Checkers extends Game {
 				return;
 			}
 
-			if (this.selectedCoordinates != null) {
+			if (this.selectedCoordinate != null) {
 				if (this.mandatoryMove || !this.select(column, row)) {
-					if (this.move(this.selectedCoordinates.column, this.selectedCoordinates.row, column, row)) {
+					if (this.move(this.selectedCoordinate.column, this.selectedCoordinate.row, column, row)) {
 						if (this.count(this.getOpponentPlayer()) == 0) {
 							this.ended = true;
 							this.winner = this.getCurrentPlayer();
@@ -105,7 +105,7 @@ public class Checkers extends Game {
 	private boolean select(int column, int row) {
 		CheckersPiece piece = this.getPiece(column, row);
 		if (piece != null && piece.getPlayerIndex() == currentPlayer) {
-			this.selectedCoordinates = new Coordinates(column, row);
+			this.selectedCoordinate = new Coordinate(column, row);
 			return true;
 		}
 		return false;
@@ -125,20 +125,20 @@ public class Checkers extends Game {
 			if (middlePiece == null || middlePiece.getPlayerIndex() == currentPlayer) {
 				return false;
 			}
-			this.selectedCoordinates = null;
+			this.selectedCoordinate = null;
 			this.setPiece(oldColumn, oldRow, null);
 			this.setPiece(oldColumn + _c / 2, oldRow + _r / 2, null);
 			this.setPiece(newColumn, newRow, piece);
 
 			if (this.hasMandatoryMoves(newColumn, newRow)) {
 				this.mandatoryMove = true;
-				this.selectedCoordinates = new Coordinates(newColumn, newRow);
+				this.selectedCoordinate = new Coordinate(newColumn, newRow);
 				return false;
 			}
 
 			this.mandatoryMove = false;
 		} else if (Math.abs(_r) == 1) {
-			this.selectedCoordinates = null;
+			this.selectedCoordinate = null;
 			this.setPiece(oldColumn, oldRow, null);
 			this.setPiece(newColumn, newRow, piece);
 		}

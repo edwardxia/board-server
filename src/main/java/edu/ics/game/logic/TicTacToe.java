@@ -1,4 +1,4 @@
-package edu.ics.game.server;
+package edu.ics.game.logic;
 
 public class TicTacToe extends Game {
 	public TicTacToe() {

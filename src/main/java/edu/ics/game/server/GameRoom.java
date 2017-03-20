@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import edu.ics.game.logic.Game;
+
 public class GameRoom {
 	private Class<? extends Game> gameClass;
 	private Game game = null;
