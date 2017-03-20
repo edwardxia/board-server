@@ -91,8 +91,6 @@ public class GameLobby {
 			// Destroy the room if no one is in it.
 			if (room.getPlayers().size() == 0) {
 				this.removeRoomByName(name);
-
-				System.out.println("Room '" + name + "' removed because everyone leaved.");
 			}
 		}
 	}
